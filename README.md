@@ -60,21 +60,16 @@ Create a users table:
 
 ```bash
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
+    id SERIAL PRIMARY KEY,                  -- Unique ID for each user
+    username VARCHAR(255) UNIQUE NOT NULL, -- Unique username
+    full_name VARCHAR(255) NOT NULL,       -- Full name of the user
+    email VARCHAR(255) UNIQUE NOT NULL,    -- Unique email address
+    password VARCHAR(255) NOT NULL,        -- Hashed password
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp for updates
 );
 
 ```
-
-Insert a test user (replace values as needed):
-
-```bash
-INSERT INTO users (email, password) VALUES ('abc@test.com', 'hashedpassword');
-
-```
-
-Note: For production, ensure that passwords are hashed (e.g., using bcrypt).
 
 ### 4. Configure Environment Variables
 

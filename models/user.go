@@ -2,11 +2,11 @@ package models
 
 import (
 	"database/sql"
+	"ynbauth/database"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var db *sql.DB
 
 type User struct {
 	ID       int    `json:"id"`
@@ -32,7 +32,7 @@ func CreateUser( username, fullName, email, password string) error {
 
 	// Insert the user into the database
 	query := `INSERT INTO users (username, full_name, email, password) VALUES ($1, $2, $3, $4)`
-	_, err = db.Exec(query, username, fullName, email, string(hashedPassword))
+	_, err = database.DB.Exec(query, username, fullName, email, string(hashedPassword))
 	if err != nil {
 		return errors.New("failed to insert user into the database")
 	}
@@ -44,15 +44,22 @@ func CreateUser( username, fullName, email, password string) error {
 // FindUser checks if a user exists by email or username and returns the user object if found.
 func FindUser(identifier string) (*User, error) {
 	var user User
+
 	query := `
-		SELECT * 
+		SELECT id, username, full_name, email, password
 		FROM users 
 		WHERE username = $1 OR email = $1
 	`
-	row := db.QueryRow(query, identifier)
-	err := row.Scan(&user.ID, &user.Username, &user.FullName, &user.Email, &user.Password)
+
+	err := database.DB.QueryRow(query, identifier).Scan(
+		&user.ID,
+		&user.Username,
+		&user.FullName,
+		&user.Email,
+		&user.Password,
+	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
